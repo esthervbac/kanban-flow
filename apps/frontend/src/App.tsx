@@ -46,12 +46,12 @@ export default function App() {
   const [modalTitle, setModalTitle] = useState("");
 
   const USER_ID = (import.meta as any).env.VITE_DATABASE_ID;
+  const API_URL =
+    (import.meta as any).env.VITE_API_URL || "http://localhost:3333";
 
   async function loadKanban() {
     try {
-      const response = await axios.get(
-        `http://localhost:3333/users/${USER_ID}/boards`,
-      );
+      const response = await axios.get(`${API_URL}/users/${USER_ID}/boards`);
       if (response.data.length > 0) setBoard(response.data[0]);
     } catch (error) {
       console.error("Erro ao carregar o Kanban", error);
@@ -67,7 +67,7 @@ export default function App() {
   async function handleCreateCard(columnId: string) {
     if (!newCardTitle.trim()) return;
     try {
-      await axios.post("http://localhost:3333/cards", {
+      await axios.post(`${API_URL}/cards`, {
         title: newCardTitle,
         columnId,
       });
@@ -104,7 +104,7 @@ export default function App() {
     setSelectedCard(null);
 
     try {
-      await axios.patch(`http://localhost:3333/cards/${cardId}`, {
+      await axios.patch(`${API_URL}/cards/${cardId}`, {
         title: modalTitle,
         description: modalDescription,
       });
@@ -124,7 +124,7 @@ export default function App() {
       setBoard({ ...board, columns: updated });
     }
     try {
-      await axios.delete(`http://localhost:3333/cards/${cardId}`);
+      await axios.delete(`${API_URL}/cards/${cardId}`);
     } catch (error) {
       loadKanban();
     }
@@ -170,7 +170,7 @@ export default function App() {
     });
 
     try {
-      await axios.patch(`http://localhost:3333/cards/${draggableId}/move`, {
+      await axios.patch(`${API_URL}/cards/${draggableId}/move`, {
         targetColumnId: destination.droppableId,
         orderedCardIds: destCards.map((c) => c.id),
       });
@@ -232,7 +232,7 @@ export default function App() {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            onClick={() => openModal(card)} // <-- CLIQUE PARA ABRIR O MODAL
+                            onClick={() => openModal(card)}
                             className={`group bg-gray-700 p-3 rounded-md border shadow flex flex-col gap-2 cursor-pointer transition duration-150 ${snapshot.isDragging ? "border-indigo-500 bg-gray-650 rotate-2" : "border-gray-600 hover:border-indigo-500"}`}
                           >
                             <div className="flex items-start justify-between gap-2">
@@ -246,7 +246,6 @@ export default function App() {
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
-                            {/* Ícone sutil se o card já possuir uma descrição */}
                             {card.description && (
                               <AlignLeft className="w-3.5 h-3.5 text-gray-400" />
                             )}
@@ -259,7 +258,6 @@ export default function App() {
                 )}
               </Droppable>
 
-              {/* Input novos cards */}
               <div className="p-3 border-t border-gray-700 bg-gray-800/30">
                 {activeColumnId === column.id ? (
                   <div className="flex flex-col gap-2">
