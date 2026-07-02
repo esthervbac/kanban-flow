@@ -13,9 +13,13 @@
     "dev:frontend": "npm run dev --workspace=apps/frontend",
     "build:backend": "npm run build --workspace=apps/backend",
     "start:backend": "node apps/backend/dist/server.js",
+    "deploy": "npm run build --workspace=apps/frontend && gh-pages -d apps/frontend/dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  }
 }
