@@ -2,6 +2,8 @@
 
 A modern, full-stack Kanban board application built with a monorepo architecture. Users can create tasks, add detailed descriptions via an interactive modal, edit titles inline, delete tasks, and fluidly drag and drop cards across columns with real-time persistence.
 
+You can access the Kanban Flow online on the links: https://esthervbac.github.io/kanban-flow/ and https://kanban-flow-frontend-delta.vercel.app/
+
 ## 🛠️ Tech Stack
 
 ### Frontend
