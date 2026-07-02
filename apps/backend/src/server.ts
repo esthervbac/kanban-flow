@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { prisma } from "./lib/prisma";
+import { Prisma } from "@prisma/client";
 
 const app = express();
 const PORT = process.env.PORT || 3333;
@@ -123,7 +124,7 @@ app.patch("/cards/:id/move", async (req, res) => {
   const { targetColumnId, orderedCardIds } = req.body;
 
   try {
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.card.update({
         where: { id },
         data: { columnId: targetColumnId },
