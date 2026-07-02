@@ -41,9 +41,9 @@ app.post("/boards", async (req, res) => {
         ownerId,
         columns: {
           create: [
-            { title: "À Fazer", order: 0 },
-            { title: "Em Progresso", order: 1 },
-            { title: "Concluído", order: 2 },
+            { title: "To Do", order: 0 },
+            { title: "Doing", order: 1 },
+            { title: "Done", order: 2 },
           ],
         },
       },
@@ -66,7 +66,11 @@ app.get("/users/:userId/boards", async (req, res) => {
       where: { ownerId: userId },
       include: {
         columns: {
-          include: { cards: true },
+          include: {
+            cards: {
+              orderBy: { order: "asc" },
+            },
+          },
         },
       },
     });
@@ -74,6 +78,104 @@ app.get("/users/:userId/boards", async (req, res) => {
     res.json(boards);
   } catch (error) {
     res.status(500).json({ error: "Erro ao buscar quadros." });
+  }
+});
+
+app.patch("/columns/:id", async (req, res) => {
+  const { id } = req.params;
+  const { title } = req.body;
+
+  try {
+    const updatedColumn = await prisma.column.update({
+      where: { id },
+      data: { title },
+    });
+    res.json(updatedColumn);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao atualizar coluna." });
+  }
+});
+
+app.post("/cards", async (req, res) => {
+  const { title, columnId } = req.body;
+
+  try {
+    const cardCount = await prisma.card.count({
+      where: { columnId },
+    });
+
+    const card = await prisma.card.create({
+      data: {
+        title,
+        columnId,
+        order: cardCount,
+      },
+    });
+
+    res.status(201).json(card);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao criar card." });
+  }
+});
+
+app.patch("/cards/:id/move", async (req, res) => {
+  const { id } = req.params;
+  const { targetColumnId, orderedCardIds } = req.body;
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.card.update({
+        where: { id },
+        data: { columnId: targetColumnId },
+      });
+
+      if (orderedCardIds && Array.isArray(orderedCardIds)) {
+        const updatePromises = orderedCardIds.map(
+          (cardId: string, index: number) =>
+            tx.card.update({
+              where: { id: cardId },
+              data: { order: index },
+            }),
+        );
+        await Promise.all(updatePromises);
+      }
+    });
+
+    res.json({ message: "Ordem e coluna atualizadas com sucesso." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao atualizar a ordem dos cards." });
+  }
+});
+
+app.delete("/cards/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await prisma.card.delete({
+      where: { id },
+    });
+    res.json({ message: "Card deletado com sucesso." });
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao deletar card." });
+  }
+});
+
+app.patch("/cards/:id", async (req, res) => {
+  const { id } = req.params;
+  const { title, description } = req.body;
+
+  try {
+    const updatedCard = await prisma.card.update({
+      where: { id },
+      data: {
+        ...(title !== undefined && { title }),
+        ...(description !== undefined && { description }),
+      },
+    });
+    res.json(updatedCard);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao editar card." });
   }
 });
 

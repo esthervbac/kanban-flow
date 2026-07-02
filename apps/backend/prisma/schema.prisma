@@ -11,11 +11,11 @@ model User {
   id        String   @id @default(uuid())
   name      String
   email     String   @unique
-  password  String // Para o sistema de autenticação que faremos depois
+  password  String 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  boards    Board[] // Relacionamento: Um usuário pode ser dono de vários quadros
-  cards     Card[] // Relacionamento: Um usuário pode estar atribuído a vários cards
+  boards    Board[] 
+  cards     Card[] 
 }
 
 model Board {
@@ -23,7 +23,7 @@ model Board {
   title     String
   ownerId   String
   owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  columns   Column[] // Relacionamento: Um quadro tem várias colunas
+  columns   Column[] 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -34,7 +34,7 @@ model Column {
   order     Int // Posição da coluna no quadro (0, 1, 2...)
   boardId   String
   board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  cards     Card[] // Relacionamento: Uma coluna tem vários cards
+  cards     Card[] 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -42,11 +42,11 @@ model Column {
 model Card {
   id          String   @id @default(uuid())
   title       String
-  description String?  @db.Text
+  description String?
   order       Int // Posição do card dentro da coluna (0, 1, 2...)
   columnId    String
   column      Column   @relation(fields: [columnId], references: [id], onDelete: Cascade)
-  users       User[] // Relacionamento Muitos-para-Muitos: Vários usuários podem estar no mesmo card
+  users       User[] 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
