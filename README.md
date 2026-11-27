@@ -154,3 +154,5 @@ Open a new terminal window at the root and run:
 ```
 
 The application will be live at `http://localhost:5173`.
+
+
